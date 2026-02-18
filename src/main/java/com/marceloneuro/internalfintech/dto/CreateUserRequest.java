@@ -1,6 +1,6 @@
 package com.marceloneuro.internalfintech.dto;
 
-public record CreateUser(
+public record CreateUserRequest(
     String fullname,
     String email,
     String password,
