@@ -2,6 +2,7 @@ package com.marceloneuro.internalfintech.service;
 
 import com.marceloneuro.internalfintech.dto.CreateUserRequest;
 import com.marceloneuro.internalfintech.dto.UserResponse;
+import com.marceloneuro.internalfintech.model.Role;
 import com.marceloneuro.internalfintech.model.User;
 import com.marceloneuro.internalfintech.model.Wallet;
 import com.marceloneuro.internalfintech.model.WalletType;
@@ -24,13 +25,14 @@ public class UserService {
     @Transactional
     public UserResponse createUser(CreateUserRequest createUserRequest) {
 
-        if(userRepository.existsByEmail()) {
+        if(userRepository.existsByEmail(createUserRequest.email())) {
             throw new IllegalArgumentException("Email already exists.");
         }
 
         User newUser = new User();
         copyCreateUserDtoToEntity(newUser, createUserRequest);
         newUser.setPassword(passwordEncoder.encode(createUserRequest.password()));
+        newUser.setRole(Role.USER);
 
 
         Wallet newUserWallet = new Wallet();
