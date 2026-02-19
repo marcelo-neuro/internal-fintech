@@ -7,6 +7,7 @@ import com.marceloneuro.internalfintech.model.Wallet;
 import com.marceloneuro.internalfintech.model.WalletType;
 import com.marceloneuro.internalfintech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserResponse createUser(CreateUserRequest createUserRequest) {
@@ -28,7 +30,8 @@ public class UserService {
 
         User newUser = new User();
         copyCreateUserDtoToEntity(newUser, createUserRequest);
-        newUser.setPassword(createUserRequest.password()); //TODO: encode here!
+        newUser.setPassword(passwordEncoder.encode(createUserRequest.password()));
+
 
         Wallet newUserWallet = new Wallet();
         newUserWallet.setBalance(BigDecimal.ZERO);
