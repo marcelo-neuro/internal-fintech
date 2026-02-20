@@ -27,7 +27,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))// Defines API as STATELESS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users", "/transactions/transfer").permitAll()
                         .anyRequest().authenticated()) // Allow all post requests for "/users" and authenticate all others requests
                 .build();
     }
