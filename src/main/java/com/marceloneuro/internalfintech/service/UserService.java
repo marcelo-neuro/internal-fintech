@@ -50,6 +50,6 @@ public class UserService {
     public void copyCreateUserDtoToEntity(User entity, CreateUserRequest dto) {
         entity.setEmail(dto.email());
         entity.setCpfCnpj(dto.cpfCnpj());
-        entity.setFullName(dto.fullname());
+        entity.setFullName(dto.fullName());
     }
 }

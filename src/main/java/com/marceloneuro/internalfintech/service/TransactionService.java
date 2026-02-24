@@ -7,11 +7,11 @@ import com.marceloneuro.internalfintech.model.Transaction;
 import com.marceloneuro.internalfintech.model.Wallet;
 import com.marceloneuro.internalfintech.repository.TransactionRepository;
 import com.marceloneuro.internalfintech.repository.WalletRepository;
+import com.marceloneuro.internalfintech.service.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,7 +29,7 @@ public class TransactionService {
         }
 
         Wallet senderWallet = walletRepository.findById(UUID.fromString(transferRequest.senderWalletId()))
-                .orElseThrow(() -> new IllegalArgumentException("Sender wallet not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Sender wallet not found."));
 
         // Validate if the sender have sufficient balance for transaction.
         if (senderWallet.getBalance().compareTo(transferRequest.amount()) < 0) {
@@ -37,7 +37,7 @@ public class TransactionService {
         }
 
         Wallet receiverWallet = walletRepository.findById(UUID.fromString(transferRequest.receiverWalletId()))
-                .orElseThrow(() -> new IllegalArgumentException("Receiver wallet not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Receiver wallet not found."));
 
         // Update balance values.
         senderWallet.setBalance(senderWallet.getBalance().subtract(transferRequest.amount()));
