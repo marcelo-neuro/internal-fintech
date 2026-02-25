@@ -2,7 +2,7 @@ package com.marceloneuro.internalfintech.service;
 
 import com.marceloneuro.internalfintech.dto.TransferRequest;
 import com.marceloneuro.internalfintech.dto.TransferResponse;
-import com.marceloneuro.internalfintech.model.OperationType;
+import com.marceloneuro.internalfintech.model.enums.OperationType;
 import com.marceloneuro.internalfintech.model.Transaction;
 import com.marceloneuro.internalfintech.model.Wallet;
 import com.marceloneuro.internalfintech.repository.TransactionRepository;

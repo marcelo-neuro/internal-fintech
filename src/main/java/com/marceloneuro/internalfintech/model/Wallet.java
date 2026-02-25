@@ -1,5 +1,6 @@
 package com.marceloneuro.internalfintech.model;
 
+import com.marceloneuro.internalfintech.model.enums.WalletType;
 import jakarta.persistence.*;
 import lombok.*;
 

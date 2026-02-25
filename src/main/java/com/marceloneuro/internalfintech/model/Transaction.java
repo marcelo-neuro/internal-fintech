@@ -1,5 +1,6 @@
 package com.marceloneuro.internalfintech.model;
 
+import com.marceloneuro.internalfintech.model.enums.OperationType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
