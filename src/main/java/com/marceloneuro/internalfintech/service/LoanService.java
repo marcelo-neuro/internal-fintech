@@ -24,7 +24,7 @@ public class LoanService {
 
     @Transactional
     public LoanResponse createLoan(LoanRequest loanRequest) {
-        Wallet receiverWallet = walletRepository.findById(UUID.fromString(loanRequest.id()))
+        Wallet receiverWallet = walletRepository.findById(UUID.fromString(loanRequest.walletId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Receiver not found."));
 
         InterestCalculationStrategy interestCalculation = loanStrategyFactory.getStrategy(loanRequest.loanType());
