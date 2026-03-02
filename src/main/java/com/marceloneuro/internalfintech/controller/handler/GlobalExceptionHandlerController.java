@@ -2,6 +2,7 @@ package com.marceloneuro.internalfintech.controller.handler;
 
 import com.marceloneuro.internalfintech.controller.handler.dto.StandardErrorResponse;
 import com.marceloneuro.internalfintech.controller.handler.dto.ValidationErrorResponse;
+import com.marceloneuro.internalfintech.service.exceptions.MissingTokenException;
 import com.marceloneuro.internalfintech.service.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -50,5 +51,16 @@ public class GlobalExceptionHandlerController {
                 .forEach(fe -> errors.addError(fe.getField(), fe.getDefaultMessage()));
 
         return ResponseEntity.status(status).body(errors);
+    }
+
+    @ExceptionHandler(MissingTokenException.class)
+    public ResponseEntity<StandardErrorResponse> handleMissingToken(MissingTokenException e,
+                                                                    HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+        StandardErrorResponse error = new StandardErrorResponse(Instant.now(), status.value(),
+                e.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status.value()).body(error);
     }
 }
