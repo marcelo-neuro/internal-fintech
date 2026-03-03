@@ -3,6 +3,7 @@ package com.marceloneuro.internalfintech.service;
 import com.marceloneuro.internalfintech.dto.LoanRequest;
 import com.marceloneuro.internalfintech.dto.LoanResponse;
 import com.marceloneuro.internalfintech.model.Loan;
+import com.marceloneuro.internalfintech.model.User;
 import com.marceloneuro.internalfintech.model.Wallet;
 import com.marceloneuro.internalfintech.repository.LoanRepository;
 import com.marceloneuro.internalfintech.repository.WalletRepository;
@@ -23,9 +24,10 @@ public class LoanService {
     private final LoanStrategyFactory loanStrategyFactory;
 
     @Transactional
-    public LoanResponse createLoan(LoanRequest loanRequest) {
-        Wallet receiverWallet = walletRepository.findById(UUID.fromString(loanRequest.walletId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Receiver not found."));
+    public LoanResponse createLoan(LoanRequest loanRequest, User loggedUser) {
+        Wallet receiverWallet = walletRepository
+                .findByIdAndUserId(UUID.fromString(loanRequest.walletId()), loggedUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Receiver not found, or access denied."));
 
         InterestCalculationStrategy interestCalculation = loanStrategyFactory.getStrategy(loanRequest.loanType());
 

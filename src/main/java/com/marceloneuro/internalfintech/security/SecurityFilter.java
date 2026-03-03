@@ -1,6 +1,5 @@
 package com.marceloneuro.internalfintech.security;
 
-import com.marceloneuro.internalfintech.service.exceptions.MissingTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
