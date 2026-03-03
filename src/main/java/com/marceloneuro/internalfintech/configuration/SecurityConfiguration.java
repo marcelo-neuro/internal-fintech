@@ -37,7 +37,8 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))// Defines API as STATELESS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/users", "/auth/login").permitAll()
-                        .anyRequest().authenticated()) // Allow all post requests for "/users" and authenticate all others requests
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .anyRequest().authenticated()) // Allow all post requests for "/users", /auth/login and swagger endpoints and authenticate all others requests
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
