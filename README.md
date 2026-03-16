@@ -4,6 +4,7 @@
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=junit5&logoColor=white)
 
 ## 📌 Business Overview
 This project is the core business of an internal corporate bank. It allows companies to offer financial services directly to their employees, working to retain talent and promote financial health. The system manages digital wallets, fee-free internal transfers and a credit granting engine (Loans).
@@ -24,6 +25,12 @@ The project is developed focusing on **Clean Code**, **SOLID** and modern archit
 * **Springdoc OpenAPI (Swagger):** Interactive API documentation.
 * **Global Exception Handling:** Standardization of API errors using `@RestControllerAdvice` (RFC 7807 Standard Error Responses).
 * **Applied Design Patterns:** Strategy, Factory, Adapter, DTO (Records).
+
+## 🧪 Testing Strategy & Quality Assurance
+To ensure enterprise-level reliability, the core business logic is heavily covered by automated unit tests using **JUnit 5** and **Mockito**, strictly following the **AAA (Arrange, Act, Assert)** pattern:
+* **Pure Domain Tests:** Design patterns (like Strategy) are tested in isolation focusing on mathematical accuracy using `BigDecimal.compareTo()` to prevent scale-related bugs.
+* **Behavior & State Verification:** Tests ensure not only that in-memory states mutate correctly, but also that the Service layer orchestrates the Repositories properly (`verify()`).
+* **Sad Paths & Edge Cases:** Robust exception testing to guarantee that transactional boundaries are respected (e.g., ensuring `save()` is `never()` called when a balance validation fails).
 
 ## ⚙️ How to run the project locally
 
