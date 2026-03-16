@@ -99,7 +99,7 @@ public class LoanServiceTest {
         assertEquals(expectedDebt, response.totalAmountDue());
         assertEquals(new BigDecimal("1100.00"), destinationWallet.getBalance());
 
-        verify(loanRepository, times(1)).save(any());
+        verify(loanRepository, times(1)).save(any(Loan.class));
     }
 
     @Test
@@ -121,5 +121,7 @@ public class LoanServiceTest {
         );
 
         assertEquals("Receiver not found, or access denied.", expectedException.getMessage());
+
+        verify(loanRepository, never()).save(any());
     }
 }
