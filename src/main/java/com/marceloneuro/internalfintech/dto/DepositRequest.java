@@ -6,15 +6,12 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
-public record TransferRequest(
+public record DepositRequest(
         @NotNull(message = "Transaction must have an amount.")
         @Positive(message = "Transaction amount must be greater than 0.")
         BigDecimal amount,
 
-        @NotBlank(message = "Transfer must have a sender.")
-        String senderWalletId,
-
-        @NotBlank(message = "Transfer must have a receiver.")
+        @NotBlank(message = "Deposit must have a receiver.")
         String receiverWalletId
 ) {
 }

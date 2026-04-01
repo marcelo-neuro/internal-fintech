@@ -1,7 +1,6 @@
 package com.marceloneuro.internalfintech.controller;
 
-import com.marceloneuro.internalfintech.dto.TransferRequest;
-import com.marceloneuro.internalfintech.dto.TransferResponse;
+import com.marceloneuro.internalfintech.dto.*;
 import com.marceloneuro.internalfintech.security.CustomUserDetails;
 import com.marceloneuro.internalfintech.service.TransactionService;
 import jakarta.validation.Valid;
@@ -27,6 +26,33 @@ public class TransactionController {
     public ResponseEntity<TransferResponse> transfer(@Valid @RequestBody TransferRequest request,
                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
         TransferResponse response = transactionService.transfer(request, userDetails.getUser());
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.id())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PostMapping("/deposit")
+    public ResponseEntity<DepositResponse> deposit(@Valid @RequestBody DepositRequest request) {
+        DepositResponse response = transactionService.deposit(request);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.id())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<WithdrawResponse> withdraw(@Valid @RequestBody WithdrawRequest request,
+                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
+        WithdrawResponse response = transactionService.withdraw(request, userDetails.getUser());
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

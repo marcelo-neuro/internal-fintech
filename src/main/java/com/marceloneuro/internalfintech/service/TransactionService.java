@@ -1,7 +1,6 @@
 package com.marceloneuro.internalfintech.service;
 
-import com.marceloneuro.internalfintech.dto.TransferRequest;
-import com.marceloneuro.internalfintech.dto.TransferResponse;
+import com.marceloneuro.internalfintech.dto.*;
 import com.marceloneuro.internalfintech.model.User;
 import com.marceloneuro.internalfintech.model.enums.OperationType;
 import com.marceloneuro.internalfintech.model.Transaction;
@@ -61,5 +60,42 @@ public class TransactionService {
         return new TransferResponse(savedTransaction);
     }
 
+    @Transactional
+    public DepositResponse deposit(DepositRequest depositRequest) {
+        Wallet receiverWallet = walletRepository.findById(UUID.fromString(depositRequest.receiverWalletId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found."));
 
+        receiverWallet.setBalance(receiverWallet.getBalance().add(depositRequest.amount()));
+
+        Transaction newTransaction = new Transaction();
+        newTransaction.setOperationType(OperationType.CASH_IN);
+        newTransaction.setAmount(depositRequest.amount());
+        newTransaction.setWalletReceiver(receiverWallet);
+
+        Transaction savedTransaction = transactionRepository.save(newTransaction);
+
+        return new DepositResponse(savedTransaction);
+    }
+
+    @Transactional
+    public WithdrawResponse withdraw(WithdrawRequest withdrawRequest, User loggedUser) {
+        Wallet senderWallet = walletRepository
+                .findByIdAndUserId(UUID.fromString(withdrawRequest.senderWalletId()), loggedUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found, or access denied."));
+
+        if (senderWallet.getBalance().compareTo(withdrawRequest.amount()) < 0) {
+            throw new IllegalArgumentException("The sender balance is insufficient for this transaction.");
+        }
+
+        senderWallet.setBalance(senderWallet.getBalance().subtract(withdrawRequest.amount()));
+
+        Transaction newTransaction = new Transaction();
+        newTransaction.setWalletSender(senderWallet);
+        newTransaction.setAmount(withdrawRequest.amount());
+        newTransaction.setOperationType(OperationType.CASH_OUT);
+
+        Transaction savedTransaction = transactionRepository.save(newTransaction);
+
+        return new WithdrawResponse(savedTransaction);
+    }
 }
