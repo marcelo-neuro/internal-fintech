@@ -29,11 +29,7 @@ public class TransactionService {
             throw new IllegalArgumentException("The receiver and the sender cannot be the same wallet.");
         }
 
-        Wallet senderWallet = walletRepository
-                .findByIdAndUserId(UUID.fromString(transferRequest.senderWalletId()), loggedUser.getId())
-                .orElseThrow(() -> {
-                   return new ResourceNotFoundException("Wallet not found, or access denied.");
-                });
+        Wallet senderWallet = authorizeSenderOperation(transferRequest.senderWalletId(), loggedUser.getId());
 
         // Validate if the sender have sufficient balance for transaction.
         if (senderWallet.getBalance().compareTo(transferRequest.amount()) < 0) {
@@ -79,9 +75,7 @@ public class TransactionService {
 
     @Transactional
     public WithdrawResponse withdraw(WithdrawRequest withdrawRequest, User loggedUser) {
-        Wallet senderWallet = walletRepository
-                .findByIdAndUserId(UUID.fromString(withdrawRequest.senderWalletId()), loggedUser.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found, or access denied."));
+        Wallet senderWallet = authorizeSenderOperation(withdrawRequest.senderWalletId(), loggedUser.getId());
 
         if (senderWallet.getBalance().compareTo(withdrawRequest.amount()) < 0) {
             throw new IllegalArgumentException("The sender balance is insufficient for this transaction.");
@@ -97,5 +91,11 @@ public class TransactionService {
         Transaction savedTransaction = transactionRepository.save(newTransaction);
 
         return new WithdrawResponse(savedTransaction);
+    }
+
+    private Wallet authorizeSenderOperation(String walletId, UUID loggedUserId) {
+        return walletRepository
+                .findByIdAndUserId(UUID.fromString(walletId), loggedUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found, or access denied."));
     }
 }

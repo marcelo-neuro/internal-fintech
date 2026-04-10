@@ -1,7 +1,6 @@
 package com.marceloneuro.internalfintech.service;
 
-import com.marceloneuro.internalfintech.dto.TransferRequest;
-import com.marceloneuro.internalfintech.dto.TransferResponse;
+import com.marceloneuro.internalfintech.dto.*;
 import com.marceloneuro.internalfintech.model.Transaction;
 import com.marceloneuro.internalfintech.model.User;
 import com.marceloneuro.internalfintech.model.Wallet;
@@ -153,5 +152,62 @@ public class TransactionServiceTest {
         assertEquals("Wallet not found, or access denied.", expectedException.getMessage());
 
         verify(transactionRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Must deposit successfully, update data and save transaction")
+    void deposit_ShouldSucceed_When_WalletExists() {
+        Wallet receiverWallet = new Wallet();
+        receiverWallet.setId(UUID.randomUUID());
+        receiverWallet.setBalance(new BigDecimal("0.00"));
+
+        DepositRequest request = new DepositRequest(
+          new BigDecimal("50.00"),
+          receiverWallet.getId().toString()
+        );
+
+        Transaction mockedSavedTransaction = new Transaction();
+        mockedSavedTransaction.setAmount(new BigDecimal("50.00"));
+        mockedSavedTransaction.setId(UUID.randomUUID());
+        mockedSavedTransaction.setWalletReceiver(receiverWallet);
+
+        when(walletRepository.findById(receiverWallet.getId()))
+                .thenReturn(Optional.of(receiverWallet));
+        when(transactionRepository.save(any(Transaction.class)))
+                .thenReturn(mockedSavedTransaction);
+
+        DepositResponse response = transactionService.deposit(request);
+
+        assertNotNull(response);
+
+        assertEquals(new BigDecimal("50.00"), receiverWallet.getBalance(), "Receiver's balance must be increased to 50.");
+        verify(transactionRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Must withdraw successfully, update data and save transaction.")
+    void withdraw_ShouldSucceed_WhenBalancesAreCorrect() {
+        senderWallet.setBalance(new BigDecimal("100.00"));
+
+        WithdrawRequest request = new WithdrawRequest(
+                new BigDecimal("50.00"),
+                senderWalletId.toString()
+        );
+
+        Transaction mockedSavedTransaction = new Transaction();
+        mockedSavedTransaction.setAmount(new BigDecimal("50.00"));
+        mockedSavedTransaction.setId(UUID.randomUUID());
+        mockedSavedTransaction.setWalletSender(senderWallet);
+
+        when(walletRepository.findByIdAndUserId(senderWalletId, loggedUser.getId()))
+                .thenReturn(Optional.of(senderWallet));
+        when(transactionRepository.save(any(Transaction.class)))
+                .thenReturn(mockedSavedTransaction);
+
+        WithdrawResponse response = transactionService.withdraw(request, loggedUser);
+
+        assertNotNull(response);
+        assertEquals(new BigDecimal("50.00"), senderWallet.getBalance(), "Sender's balance must be decreased to 50.");
+        verify(transactionRepository, times(1)).save(any());
     }
 }
