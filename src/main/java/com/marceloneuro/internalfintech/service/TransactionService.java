@@ -1,15 +1,15 @@
 package com.marceloneuro.internalfintech.service;
 
 import com.marceloneuro.internalfintech.dto.*;
-import com.marceloneuro.internalfintech.model.User;
-import com.marceloneuro.internalfintech.model.enums.OperationType;
 import com.marceloneuro.internalfintech.model.Transaction;
+import com.marceloneuro.internalfintech.model.User;
 import com.marceloneuro.internalfintech.model.Wallet;
+import com.marceloneuro.internalfintech.model.enums.OperationType;
 import com.marceloneuro.internalfintech.repository.TransactionRepository;
 import com.marceloneuro.internalfintech.repository.WalletRepository;
-import com.marceloneuro.internalfintech.security.CustomUserDetails;
 import com.marceloneuro.internalfintech.service.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +21,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public TransferResponse transfer(TransferRequest transferRequest, User loggedUser) {
@@ -52,6 +53,7 @@ public class TransactionService {
 
         // Save entities.
         Transaction savedTransaction = transactionRepository.save(newTransaction);
+        applicationEventPublisher.publishEvent(new TransferCreatedEvent(savedTransaction));
 
         return new TransferResponse(savedTransaction);
     }
@@ -69,6 +71,7 @@ public class TransactionService {
         newTransaction.setWalletReceiver(receiverWallet);
 
         Transaction savedTransaction = transactionRepository.save(newTransaction);
+        applicationEventPublisher.publishEvent(new DepositCreatedEvent(savedTransaction));
 
         return new DepositResponse(savedTransaction);
     }
@@ -89,6 +92,7 @@ public class TransactionService {
         newTransaction.setOperationType(OperationType.CASH_OUT);
 
         Transaction savedTransaction = transactionRepository.save(newTransaction);
+        applicationEventPublisher.publishEvent(new WithdrawCreatedEvent(savedTransaction));
 
         return new WithdrawResponse(savedTransaction);
     }
